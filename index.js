@@ -170,7 +170,6 @@ async function promptFolderNames(prompt, folders) {
   return Object.values(answers);
 }
 
-createMainDirectory();
-if (process.argv[2] === "create-app") {
+if (process.argv[2] === "ez-app-builder") {
   createMainDirectory();
 }
