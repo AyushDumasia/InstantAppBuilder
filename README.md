@@ -1,15 +1,15 @@
-# EasyBackendSetup
+# ez-app-builder
 
 ## Description
 
-EasyBackendSetup simplifies the setup process for both frontend and backend projects in Node.js. With this package, you can quickly set up your project by installing necessary packages and creating folders. Additionally, you have the flexibility to customize folder names according to your project's requirements.
+ez-app-builder simplifies the setup process for both frontend and backend projects in Node.js. With this package, you can quickly set up your project by installing necessary packages and creating folders. Additionally, you have the flexibility to customize folder names according to your project's requirements.
 
 ## Usage
 
 1. **Installation**:
 
    - First, ensure you have Node.js installed on your system.
-   - Install EasyBackendSetup globally by running the following command in your terminal:
+   - Install ez-app-builder globally by running the following command in your terminal:
 
      ```bash
      npm install -g ez-app-builder
@@ -36,7 +36,7 @@ EasyBackendSetup simplifies the setup process for both frontend and backend proj
 
 5. **Project Setup**:
 
-   - EasyBackendSetup will create the project structure and install the selected npm packages.
+   - ez-app-builder will create the project structure and install the selected npm packages.
    - Progress messages will be displayed in the terminal, indicating the setup process.
 
 6. **Start Developing**:
@@ -44,4 +44,4 @@ EasyBackendSetup simplifies the setup process for both frontend and backend proj
 
 ## Conclusion
 
-EasyBackendSetup offers a convenient and efficient way to initialize frontend and backend projects in Node.js. By automating the setup process and providing customization options, it allows developers to focus on building their applications without getting bogged down by setup complexities.
+ez-app-builder offers a convenient and efficient way to initialize frontend and backend projects in Node.js. By automating the setup process and providing customization options, it allows developers to focus on building their applications without getting bogged down by setup complexities.
