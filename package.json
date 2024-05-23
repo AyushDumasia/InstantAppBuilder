@@ -1,5 +1,5 @@
 {
-  "name": "app-builder",
+  "name": "create-app-builder",
   "version": "1.0.0",
   "description": "This is package for a creating backend app setup",
   "main": "index.cjs",
@@ -7,9 +7,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "create-app": "./index.js"
+  },
   "author": "AYUSH DUMASIA",
   "license": "ISC",
   "dependencies": {
+    "create-app-builder": "^1.0.0",
     "inquirer": "^9.2.22",
     "path": "^0.12.7"
   }

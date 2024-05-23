@@ -96,3 +96,7 @@ async function promptFolderNames(prompt, folders) {
   const answers = await prompt(questions);
   return Object.values(answers);
 }
+
+if (process.argv[2] === "create-app") {
+  createMainDirectory();
+}
