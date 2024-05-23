@@ -1,6 +1,6 @@
 {
   "name": "create-app-builder",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "This is package for a creating backend app setup",
   "main": "index.cjs",
   "type": "commonjs",
