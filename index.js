@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-const path = require("path");
-const fs = require("fs");
-const { exec } = require("child_process");
+import path from "path";
+import fs from "fs";
+import { exec } from "child_process";
+import inquirer from "inquirer";
 
 async function createMainDirectory() {
   const folders = ["backend", "frontend"];
   const targetDir = process.cwd();
-  const { default: inquirer } = await import("inquirer");
   const folderNames = await promptMainDirectory(inquirer.prompt, folders);
   try {
     folderNames.forEach((folderName) => {
@@ -21,11 +21,15 @@ async function createMainDirectory() {
       const backendFolderName = folderNames[0];
       const frontendFolderName = folderNames[1];
       await createBackendStructure(backendFolderName);
-      await createMainFile(backendFolderName);
-      await promptAndInstallPackages(backendFolderName);
-      const installVite = await promptInstallVite(inquirer.prompt);
-      if (installVite) {
-        await createFrontendStructure(frontendFolderName);
+      const selectedPackages = await promptAndInstallPackages(
+        backendFolderName
+      );
+      await createMainFile(backendFolderName, "app.js", selectedPackages);
+      await createConnectDBFile(backendFolderName);
+
+      if (frontendFolderName) {
+        const viteTemplate = await promptViteTemplate(inquirer.prompt);
+        await createFrontendStructure(frontendFolderName, viteTemplate);
       }
     }
   } catch (err) {
@@ -45,8 +49,6 @@ async function createBackendStructure(folderName) {
   ];
   const targetDir = path.join(process.cwd(), folderName);
 
-  const { default: inquirer } = await import("inquirer");
-
   const folderNames = await promptFolderNames(inquirer.prompt, folders);
 
   try {
@@ -62,13 +64,13 @@ async function createBackendStructure(folderName) {
   }
 }
 
-async function createFrontendStructure(folderName) {
+async function createFrontendStructure(folderName, template) {
   const targetDir = path.join(process.cwd(), folderName);
   try {
     console.log("Creating Vite project...");
     return new Promise((resolve, reject) => {
       exec(
-        `npm create vite@latest ${folderName} -- --template react`,
+        `npm create vite@latest ${folderName} -- --template ${template}`,
         { cwd: process.cwd() },
         (err, stdout, stderr) => {
           if (err) {
@@ -108,8 +110,6 @@ async function promptAndInstallPackages(folderName) {
   ];
 
   const devPackages = ["nodemon"];
-
-  const { default: inquirer } = await import("inquirer");
 
   const questions = packages.map((pkg) => ({
     type: "confirm",
@@ -151,7 +151,7 @@ async function promptAndInstallPackages(folderName) {
                     return;
                   }
                   console.log("Dev packages installed successfully!");
-                  resolve();
+                  resolve(selectedPackages);
                 }
               );
             }
@@ -160,7 +160,7 @@ async function promptAndInstallPackages(folderName) {
       });
     } else {
       console.log("No packages selected for installation.");
-      return Promise.resolve();
+      return Promise.resolve([]);
     }
   } catch (err) {
     console.error("Error installing npm packages:", err);
@@ -183,16 +183,71 @@ async function promptMainDirectory(prompt, folders) {
   return names;
 }
 
-async function createMainFile(mainDirectoryName, mainFileName = "app.js") {
+async function createMainFile(
+  mainDirectoryName,
+  mainFileName = "app.js",
+  packages = []
+) {
   const targetDir = path.join(process.cwd(), mainDirectoryName);
   const mainFilePath = path.join(targetDir, mainFileName);
-  const fileContent = "// Your main file content goes here\n";
+
+  const importStatements = packages
+    .map((pkg) => {
+      if (pkg === "body-parser") {
+        return "import bodyParser from 'body-parser';";
+      }
+      if (pkg === "cookie-parser") {
+        return "import cookieParser from 'cookie-parser';";
+      }
+      if (pkg === "method-override") {
+        return "import methodOverride from 'method-override';";
+      }
+      if (pkg === "express-validator") {
+        return "import { body, validationResult } from 'express-validator';";
+      }
+      return `import ${pkg} from '${pkg}';`;
+    })
+    .join("\n");
+
+  const dotenvConfig = packages.includes("dotenv")
+    ? `import dotenv from 'dotenv';\n\ndotenv.config({ path: './.env' });\n\nconst PORT = process.env.PORT || 3000;\n`
+    : `const PORT = process.env.PORT || 3000;\n`;
+
+  const fileContent = `// Your main file content goes here\n${importStatements}\n\nimport connectDB from './db/connectDB';\n\nconst app = express();\n\napp.use(express.urlencoded({ extended: true }));\napp.use(express.static('public'));\napp.use(express.json());\napp.use(cookieParser());\napp.use(morgan('dev'));\n\n${dotenvConfig}app.listen(PORT, () => {\n    console.log(\`App is listening on \${PORT}\`);\n    connectDB();\n});\n`;
 
   try {
     fs.writeFileSync(mainFilePath, fileContent);
     console.log(`Created file: ${mainFilePath}`);
   } catch (err) {
     console.error("Error creating main file:", err);
+  }
+}
+
+async function createConnectDBFile(backendFolderName) {
+  const targetDir = path.join(process.cwd(), backendFolderName, "db");
+  const connectDBFilePath = path.join(targetDir, "connectDB.js");
+
+  const fileContent = `import mongoose from 'mongoose';
+
+const connectDB = () => {
+    mongoose
+        .connect(process.env.MONGO_URL || "mongodb://127.0.0.1:27017/projectName'")
+        .then(() => {
+            console.log('Connected to the database');
+        })
+        .catch((err) => {
+            console.error('Error connecting to the database:', err.message);
+        });
+};
+
+export default connectDB;
+`;
+
+  try {
+    fs.writeFileSync(connectDBFilePath, fileContent);
+    console.log(`Created file: ${connectDBFilePath}`);
+  } catch (err) {
+    console.error("Error creating connectDB file:", err);
   }
 }
 
@@ -208,16 +263,17 @@ async function promptFolderNames(prompt, folders) {
   return Object.values(answers);
 }
 
-async function promptInstallVite(prompt) {
+async function promptViteTemplate(prompt) {
   const question = {
-    type: "confirm",
-    name: "installVite",
-    message: "Do you want to install a Vite app in the frontend directory?",
-    default: true,
+    type: "list",
+    name: "template",
+    message: "Choose a Vite template:",
+    choices: ["vanilla", "react", "vue", "preact"],
+    default: "react",
   };
 
   const answer = await prompt(question);
-  return answer.installVite;
+  return answer.template;
 }
 
 createMainDirectory();
