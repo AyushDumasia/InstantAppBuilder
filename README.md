@@ -1,119 +1,126 @@
-# Project Setup Script
+Certainly! Here's an updated version of the README.md file with instructions on how to use ez-app-builder and examples of creating full-stack projects, as well as backend and frontend individually:
 
-This script automates the creation of a basic project structure with `backend` and `frontend` directories. It sets up the backend with various subdirectories and installs selected npm packages. The script also initializes a Vite project for the frontend if selected.
+````markdown
+# ez-app-builder
+
+[![npm version](https://img.shields.io/npm/v/ez-app-builder.svg?style=flat-square)](https://www.npmjs.com/package/ez-app-builder)
+[![npm downloads](https://img.shields.io/npm/dm/ez-app-builder.svg?style=flat-square)](https://www.npmjs.com/package/ez-app-builder)
+[![License](https://img.shields.io/npm/l/ez-app-builder.svg?style=flat-square)](https://github.com/yourusername/ez-app-builder/blob/master/LICENSE)
+
+ez-app-builder is a Node.js package designed to streamline the process of setting up full-stack applications. It automates the creation of directory structures and offers an interactive interface to install essential npm packages. With ez-app-builder, developers can quickly initialize their projects, saving time and effort in the setup phase.
 
 ## Features
 
-1. **Main Directory Creation**
+- **Automated Directory Structure**: Quickly set up backend and frontend directories with a simple command.
+- **Interactive Package Installation**: Choose from a list of essential npm packages to install for your project.
+- **Supports Full-Stack Applications**: Build both backend and frontend parts of your application effortlessly.
+- **Saves Time and Effort**: Eliminate the manual setup process and get started with your project right away.
 
-   - Creates `backend` and `frontend` directories based on user input.
+## Installation
 
-2. **Backend Structure**
+You can install ez-app-builder globally using npm:
 
-   - Creates subdirectories such as `db`, `models`, `routes`, `controllers`, `middlewares`, `utils`, and `validators` within the backend directory.
-
-3. **Frontend Structure**
-
-   - Optionally initializes a Vite project using the `npm create vite@latest` command.
-
-4. **Package Installation**
-
-   - Prompts the user to install selected npm packages for the backend, including `express`, `mongoose`, `cors`, `dotenv`, and others.
-   - Installs development dependencies such as `nodemon`.
-
-5. **Main File Creation**
-
-   - Generates an `app.js` file in the backend directory with boilerplate code.
-   - Includes import statements for the selected packages.
-   - Configures `dotenv` if selected.
-
-6. **Database Connection Setup**
-
-   - Creates a `connectDB.js` file in the `db` directory to handle database connection using Mongoose.
-
-7. **ES Modules Support**
-   - Sets the `type` field in `package.json` to `module` to enable ES module syntax.
-
-### Prompts
-
-1. **Main Directory Names**
-
-   - Enter a name for the backend directory (default: `backend`)
-   - Enter a name for the frontend directory (default: `frontend`)
-
-2. **Package Installation**
-   - Do you want to install `express`? (yes/no)
-   - Do you want to install `mongoose`? (yes/no)
-   - (and so on for other packages)
-
-### Generated Structure
-
-```plaintext
-project-root/
-├── backend/
-│   ├── db/
-│   ├── models/
-│   ├── routes/
-│   ├── controllers/
-│   ├── middlewares/
-│   ├── utils/
-│   ├── validators/
-│   ├── app.js
-│   ├── package.json
-├── frontend/ (if Vite is installed)
-│   ├── (Vite project structure)
+```bash
+npm install -g ez-app-builder
 ```
+````
 
-### `app.js` Example
+## Usage
 
-If `dotenv` and other packages are selected, `app.js` might look like:
+Once installed, you can use ez-app-builder commands to create your projects:
 
-```javascript
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import dotenv from "dotenv";
-import bodyParser from "body-parser";
-import methodOverride from "method-override";
-import axios from "axios";
-import morgan from "morgan";
-import jsonwebtoken from "jsonwebtoken";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
-import { body, validationResult } from "express-validator";
-import cookieParser from "cookie-parser";
-import { v4 as uuidv4 } from "uuid";
-import multer from "multer";
+- To build your project: `build`
+- To build the backend: `build-backend`
+- To build the frontend: `build-frontend`
 
-dotenv.config({
-  path: "./.env",
-});
+Follow the prompts to customize your project setup and package installations.
 
-const PORT = process.env.PORT || 3000;
+## How to Use
+
+### Creating a Full-Stack Project
+
+To create a full-stack project, follow these steps:
+
+1. Run ` build` in your terminal.
+2. Enter a name for your project and choose the packages you want to install.
+3. The script will create backend and frontend directories with the specified name and install the chosen packages in each directory.
+4. You can then customize the backend and frontend as needed for your project.
+
+### Creating Backend Only
+
+To create a backend-only project, follow these steps:
+
+1. Run `build-backend` in your terminal.
+2. Enter a name for your backend directory and choose the packages you want to install.
+3. The script will create a backend directory with the specified name and install the chosen packages.
+4. You can then customize the backend for your project.
+
+### Creating Frontend Only
+
+To create a frontend-only project, follow these steps:
+
+1. Run `build-frontend` in your terminal.
+2. Enter a name for your frontend directory and choose the packages you want to install.
+3. The script will create a frontend directory with the specified name and install the chosen packages.
+4. You can then customize the frontend for your project.
+
+## Customization
+
+- **Project Name**: You can customize the name of your project by entering a different name when prompted.
+- **Packages**: Choose the npm packages you want to install for your project. Select from the list of available packages or enter custom package names.
+
+## Setup for MongoDB Configuration
+
+To set up a MongoDB configuration and connect to a MongoDB database in your backend project, follow these steps:
+
+1. Ensure that `mongoose` is included as part of your project dependencies. If not, you can install it using `npm install mongoose` in your backend directory.
+
+2. Update your main backend file (e.g., `index.js` or `server.js`) to import and call the `connectDB` function:
+
+````javascript
+import express from 'express';
+import mongoose from 'mongoose';
 
 const app = express();
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
-app.use(express.json());
-app.use(cookieParser());
-app.use(morgan("dev"));
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mydatabase')
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`App is listening on ${PORT}`);
-  connectDB();
+  console.log(`Server is running on port ${PORT}`);
 });
-```
+
+
+## Setup for Main File in Backend
+
+The main file in the backend directory is typically named `index.js` or `server.js`. You can customize this file to set up your backend server using Express, Koa, or any other framework of your choice. Here's an example of setting up a basic Express server in `index.js`:
+
+```javascript
+import express from "express";
+
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send("Hello, world!");
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+````
+
+You can further customize this file to add routes, middleware, database connections, etc., based on your project requirements.
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ```
 
-This `README.md` file provides a comprehensive guide on what the script does, how to use it, and what the expected outcomes are. Adjust the details as necessary to fit the specifics of your project and script usage.
-```
-
-```
-
+Feel free to adjust the instructions and examples according to your project's specific needs. Once you're satisfied with the README.md file, you can publish your package to npm using the `npm publish` command. Make sure you have an npm account and are logged in before publishing.
 ```

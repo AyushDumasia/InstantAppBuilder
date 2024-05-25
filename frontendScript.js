@@ -5,7 +5,7 @@ import { exec } from "child_process";
 import inquirer from "inquirer";
 
 async function createMainDirectory() {
-  const folders = ["backend", "frontend"];
+  const folders = ["frontend"];
   const targetDir = process.cwd();
   const folderNames = await promptMainDirectory(inquirer.prompt, folders);
   try {
@@ -18,8 +18,7 @@ async function createMainDirectory() {
     console.log("Main directory structure created successfully!");
 
     if (folderNames.length > 0) {
-      const backendFolderName = folderNames[0];
-      const frontendFolderName = folderNames[1];
+      const frontendFolderName = folderNames[0];
       if (frontendFolderName) {
         const viteTemplate = await promptViteTemplate(inquirer.prompt);
         await createFrontendStructure(frontendFolderName, viteTemplate);
@@ -29,7 +28,6 @@ async function createMainDirectory() {
     console.error(err);
   }
 }
-createMainDirectory();
 async function createFrontendStructure(folderName, template) {
   const targetDir = path.join(process.cwd(), folderName);
   try {
@@ -94,3 +92,5 @@ async function promptViteTemplate(prompt) {
   const answer = await prompt(question);
   return answer.template;
 }
+
+createMainDirectory();

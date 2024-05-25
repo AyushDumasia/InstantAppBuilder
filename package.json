@@ -1,6 +1,6 @@
 {
   "name": "ez-app-builder",
-  "version": "2.2.0",
+  "version": "2.3.1",
   "description": "ez-app-builder is a Node.js package designed to streamline the process of setting up full stack applications. It automates the creation of directory structures and offers an interactive interface to install essential npm packages. With ez-app-builder, developers can quickly initialize their projects, saving time and effort in the setup phase.",
   "main": "index.js",
   "type": "module",
@@ -8,10 +8,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "ez-app-builder": "./index.js"
+    "build": "./script.js",
+    "build-backend": "./backendScript.js",
+    "build-frontend": "./frontendScript.js"
   },
   "author": "AYUSH DUMASIA",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "inquirer": "^9.2.22",
     "path": "^0.12.7"
