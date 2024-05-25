@@ -1,13 +1,17 @@
-Certainly! Here's an updated version of the README.md file with instructions on how to use ez-app-builder and examples of creating full-stack projects, as well as backend and frontend individually:
+Sure, here's the entire README.md file with the corrected formatting:
 
-![C](https://img.shields.io/badge/c-%2300599C.svg?style=for-the-badge&logo=c&logoColor=white)
-![npm version](https://img.shields.io/npm/v/ez-app-builder.svg?style=flat-square)
-![npm download](https://img.shields.io/npm/dm/ez-app-builder.svg?style=flat-square)
-![License](https://img.shields.io/npm/l/ez-app-builder.svg?style=flat-square)
-
-````markdown
 # ez-app-builder
 
+<div style="text-align:center">
+  <img src="https://img.shields.io/npm/v/ez-app-builder.svg?style=flat-square" alt="npm version" height="30">
+  <img src="https://img.shields.io/npm/dm/ez-app-builder.svg?style=flat-square" alt="npm download" height="30">
+  <img src="https://img.shields.io/npm/l/ez-app-builder.svg?style=flat-square" alt="License" height="30">
+</div>
+
+<hr>
+<br>
+
+````markdown
 ez-app-builder is a Node.js package designed to streamline the process of setting up full-stack applications. It automates the creation of directory structures and offers an interactive interface to install essential npm packages. With ez-app-builder, developers can quickly initialize their projects, saving time and effort in the setup phase.
 
 ## Features
@@ -19,10 +23,10 @@ ez-app-builder is a Node.js package designed to streamline the process of settin
 
 ## Installation
 
-You can install ez-app-builder globally using npm:
+You can install `ez-app-builder globally` using npm:
 
 ```bash
-npm install -g ez-app-builder
+`npm install -g ez-app-builder`
 ```
 ````
 
@@ -42,7 +46,7 @@ Follow the prompts to customize your project setup and package installations.
 
 To create a full-stack project, follow these steps:
 
-1. Run ` build` in your terminal.
+1. Run `build` in your terminal.
 2. Enter a name for your project and choose the packages you want to install.
 3. The script will create backend and frontend directories with the specified name and install the chosen packages in each directory.
 4. You can then customize the backend and frontend as needed for your project.
@@ -78,23 +82,23 @@ To set up a MongoDB configuration and connect to a MongoDB database in your back
 
 2. Update your main backend file (e.g., `index.js` or `server.js`) to import and call the `connectDB` function:
 
-````javascript
-import express from 'express';
-import mongoose from 'mongoose';
+```javascript
+import express from "express";
+import mongoose from "mongoose";
 
 const app = express();
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mydatabase')
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.error('MongoDB connection error:', err));
-
+mongoose
+  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/mydatabase")
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
+```
 
 ## Setup for Main File in Backend
 
@@ -113,15 +117,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-````
+```
 
 You can further customize this file to add routes, middleware, database connections, etc., based on your project requirements.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-```
-
-Feel free to adjust the instructions and examples according to your project's specific needs. Once you're satisfied with the README.md file, you can publish your package to npm using the `npm publish` command. Make sure you have an npm account and are logged in before publishing.
-```
