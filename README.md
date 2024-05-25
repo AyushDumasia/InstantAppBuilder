@@ -3,9 +3,9 @@ Certainly! Here's an updated version of the README.md file with instructions on 
 ````markdown
 # ez-app-builder
 
-`[[npm version](https://img.shields.io/npm/v/ez-app-builder.svg?style=flat-square)](https://www.npmjs.com/package/ez-app-builder)`
-`[(https://img.shields.io/npm/dm/ez-app-builder.svg?style=flat-square)](https://www.npmjs.com/package/ez-app-builder)`
-`[(https://img.shields.io/npm/l/ez-app-builder.svg?style=flat-square)](https://github.com/yourusername/ez-app-builder/blob/master/LICENSE)`
+![npm version](https://img.shields.io/npm/v/ez-app-builder.svg?style=flat-square)
+![npm downloads](https://img.shields.io/npm/dm/ez-app-builder.svg?style=flat-square)
+![License](https://img.shields.io/npm/l/ez-app-builder.svg?style=flat-square)
 
 ez-app-builder is a Node.js package designed to streamline the process of setting up full-stack applications. It automates the creation of directory structures and offers an interactive interface to install essential npm packages. With ez-app-builder, developers can quickly initialize their projects, saving time and effort in the setup phase.
 
