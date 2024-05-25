@@ -26,6 +26,7 @@ async function createMainDirectory() {
       );
       const mainFileName = await promptMainFileName(inquirer.prompt);
       await createMainFile(backendFolderName, mainFileName, selectedPackages);
+      await createConnectDBFile(backendFolderName);
       await updatePackageJson(backendFolderName, mainFileName);
 
       if (selectedPackages.includes("mongoose")) {
@@ -192,6 +193,9 @@ async function createMainFile(
       if (pkg === "cookie-parser") {
         return "import cookieParser from 'cookie-parser';";
       }
+      if (pkg === "uuid") {
+        return "import { v4 as uuidv4 } from 'uuid';";
+      }
       if (pkg === "method-override") {
         return "import methodOverride from 'method-override';";
       }
@@ -203,8 +207,8 @@ async function createMainFile(
     .join("\n");
 
   const dotenvConfig = packages.includes("dotenv")
-    ? `import dotenv from 'dotenv';\n\ndotenv.config({ path: './.env' });\n\nconst PORT = process.env.PORT || 3000;\n`
-    : `const PORT = process.env.PORT || 3000;\n`;
+    ? `\n\ndotenv.config({ path: './.env' });\n\nconst PORT = process.env.PORT || 3000;\n`
+    : `const PORT = 3000;`;
 
   const additionalConfigs = [];
 
@@ -232,7 +236,9 @@ async function createMainFile(
 ${importStatements}
 
 ${
-  packages.includes("mongoose") ? "import connectDB from './db/connectDB';" : ""
+  packages.includes("mongoose")
+    ? "import connectDB from './db/connectDB.js';"
+    : ""
 }
 
 const app = express();
@@ -244,6 +250,10 @@ app.use(express.static('public'));
 ${additionalConfigs.join("\n")}
 
 ${dotenvConfig}
+\n
+app.get("/", (req, res) => {
+  res.send("App is working");
+});\n
 app.listen(PORT, () => {
     console.log(\`App is listening on \${PORT}\`);
     ${packages.includes("mongoose") ? "connectDB();" : ""}

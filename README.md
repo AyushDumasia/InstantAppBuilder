@@ -1,5 +1,3 @@
-Sure, here's the entire README.md file with the corrected formatting:
-
 # ez-app-builder
 
 <div style="text-align:center">

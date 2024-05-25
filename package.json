@@ -1,6 +1,6 @@
 {
   "name": "ez-app-builder",
-  "version": "2.3.3",
+  "version": "2.3.6",
   "description": "ez-app-builder is a Node.js package designed to streamline the process of setting up full stack applications. It automates the creation of directory structures and offers an interactive interface to install essential npm packages. With ez-app-builder, developers can quickly initialize their projects, saving time and effort in the setup phase.",
   "main": "index.js",
   "type": "module",

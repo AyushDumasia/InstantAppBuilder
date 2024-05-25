@@ -24,8 +24,10 @@ async function createMainDirectory() {
       const selectedPackages = await promptAndInstallPackages(
         backendFolderName
       );
-      await createMainFile(backendFolderName, "app.js", selectedPackages);
+      const mainFileName = await promptMainFileName(inquirer.prompt);
+      await createMainFile(backendFolderName, mainFileName, selectedPackages);
       await createConnectDBFile(backendFolderName);
+      await updatePackageJson(backendFolderName, mainFileName);
 
       if (frontendFolderName) {
         const viteTemplate = await promptViteTemplate(inquirer.prompt);
@@ -34,6 +36,50 @@ async function createMainDirectory() {
     }
   } catch (err) {
     console.error(err);
+  }
+}
+
+async function createConnectDBFile(backendFolderName) {
+  const targetDir = path.join(process.cwd(), backendFolderName, "db");
+  const connectDBFilePath = path.join(targetDir, "connectDB.js");
+
+  const fileContent = `import mongoose from 'mongoose';
+
+const connectDB = () => {
+    mongoose
+        .connect(process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/projectName')
+        .then(() => {
+            console.log('=>Connected to the database');
+        })
+        .catch((err) => {
+            console.error('Error connecting to the database:', err.message);
+        });
+};
+
+export default connectDB;
+`;
+
+  try {
+    fs.writeFileSync(connectDBFilePath, fileContent);
+    console.log(`Created file: ${connectDBFilePath}`);
+  } catch (err) {
+    console.error("Error creating connectDB file:", err);
+  }
+}
+
+async function updatePackageJson(mainDirectoryName, mainFileName) {
+  const targetDir = path.join(process.cwd(), mainDirectoryName);
+  const packageJsonPath = path.join(targetDir, "package.json");
+
+  try {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+    packageJson.main = mainFileName;
+    packageJson.type = "module";
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+    console.log(`Updated package.json main field to: ${mainFileName}`);
+    console.log("Set package.json type to module");
+  } catch (err) {
+    console.error("Error updating package.json:", err);
   }
 }
 
@@ -79,7 +125,7 @@ async function createFrontendStructure(folderName, template) {
             return;
           }
           console.log(stdout);
-          console.log("Vite project created successfully!");
+          console.log("=>Vite project created successfully!");
           resolve();
         }
       );
@@ -92,24 +138,21 @@ async function createFrontendStructure(folderName, template) {
 async function promptAndInstallPackages(folderName) {
   const targetDir = path.join(process.cwd(), folderName);
   const packages = [
-    "express",
     "mongoose",
     "cors",
     "dotenv",
     "body-parser",
-    "method-override",
-    "axios",
     "morgan",
     "jsonwebtoken",
     "zod",
     "bcryptjs",
-    "express-validator",
     "cookie-parser",
     "uuid",
     "multer",
   ];
 
   const devPackages = ["nodemon"];
+  const alwaysInstalledPackages = ["express"];
 
   const questions = packages.map((pkg) => ({
     type: "confirm",
@@ -122,46 +165,43 @@ async function promptAndInstallPackages(folderName) {
     const answers = await inquirer.prompt(questions);
 
     const selectedPackages = packages.filter((pkg) => answers[pkg]);
-    if (selectedPackages.length > 0) {
-      console.log("Initializing npm and installing packages...");
-      return new Promise((resolve, reject) => {
-        exec(`npm init -y`, { cwd: targetDir }, (err, stdout, stderr) => {
-          if (err) {
-            console.error(`Error initializing npm: ${err}`);
-            reject(err);
-            return;
-          }
-          exec(
-            `npm install ${selectedPackages.join(" ")}`,
-            { cwd: targetDir },
-            (err, stdout, stderr) => {
-              if (err) {
-                console.error(`Error installing packages: ${err}`);
-                reject(err);
-                return;
-              }
-              console.log("Packages installed successfully!");
-              exec(
-                `npm install -D ${devPackages.join(" ")}`,
-                { cwd: targetDir },
-                (err, stdout, stderr) => {
-                  if (err) {
-                    console.error(`Error installing dev packages: ${err}`);
-                    reject(err);
-                    return;
-                  }
-                  console.log("Dev packages installed successfully!");
-                  resolve(selectedPackages);
-                }
-              );
+    selectedPackages.push(...alwaysInstalledPackages);
+
+    console.log("Initializing npm and installing packages...");
+    return new Promise((resolve, reject) => {
+      exec(`npm init -y`, { cwd: targetDir }, (err, stdout, stderr) => {
+        if (err) {
+          console.error(`Error initializing npm: ${err}`);
+          reject(err);
+          return;
+        }
+        exec(
+          `npm install ${selectedPackages.join(" ")}`,
+          { cwd: targetDir },
+          (err, stdout, stderr) => {
+            if (err) {
+              console.error(`Error installing packages: ${err}`);
+              reject(err);
+              return;
             }
-          );
-        });
+            console.log("=>Packages installed successfully!");
+            exec(
+              `npm install -D ${devPackages.join(" ")}`,
+              { cwd: targetDir },
+              (err, stdout, stderr) => {
+                if (err) {
+                  console.error(`Error installing dev packages: ${err}`);
+                  reject(err);
+                  return;
+                }
+                console.log("=>Dev packages installed successfully!");
+                resolve(selectedPackages);
+              }
+            );
+          }
+        );
       });
-    } else {
-      console.log("No packages selected for installation.");
-      return Promise.resolve([]);
-    }
+    });
   } catch (err) {
     console.error("Error installing npm packages:", err);
     return Promise.reject(err);
@@ -183,9 +223,20 @@ async function promptMainDirectory(prompt, folders) {
   return names;
 }
 
+async function promptMainFileName(prompt) {
+  const question = {
+    type: "input",
+    name: "mainFileName",
+    message: "Enter a name for the main file (default: index.js):",
+    default: "index.js",
+  };
+  const answer = await prompt(question);
+  return answer.mainFileName;
+}
+
 async function createMainFile(
   mainDirectoryName,
-  mainFileName = "app.js",
+  mainFileName = "index.js",
   packages = []
 ) {
   const targetDir = path.join(process.cwd(), mainDirectoryName);
@@ -195,6 +246,9 @@ async function createMainFile(
     .map((pkg) => {
       if (pkg === "body-parser") {
         return "import bodyParser from 'body-parser';";
+      }
+      if (pkg === "uuid") {
+        return "import { v4 as uuidv4 } from 'uuid';";
       }
       if (pkg === "cookie-parser") {
         return "import cookieParser from 'cookie-parser';";
@@ -210,44 +264,65 @@ async function createMainFile(
     .join("\n");
 
   const dotenvConfig = packages.includes("dotenv")
-    ? `import dotenv from 'dotenv';\n\ndotenv.config({ path: './.env' });\n\nconst PORT = process.env.PORT || 3000;\n`
-    : `const PORT = process.env.PORT || 3000;\n`;
+    ? `\n\ndotenv.config({ path: './.env' });\n\nconst PORT = process.env.PORT || 3000;\n`
+    : `const PORT = 3000;`;
 
-  const fileContent = `// Your main file content goes here\n${importStatements}\n\nimport connectDB from './db/connectDB';\n\nconst app = express();\n\napp.use(express.urlencoded({ extended: true }));\napp.use(express.static('public'));\napp.use(express.json());\napp.use(cookieParser());\napp.use(morgan('dev'));\n\n${dotenvConfig}app.listen(PORT, () => {\n    console.log(\`App is listening on \${PORT}\`);\n    connectDB();\n});\n`;
+  const additionalConfigs = [];
+
+  if (packages.includes("body-parser")) {
+    additionalConfigs.push("app.use(bodyParser.json());");
+    additionalConfigs.push(
+      "app.use(bodyParser.urlencoded({ extended: true }));"
+    );
+  }
+
+  if (packages.includes("cookie-parser")) {
+    additionalConfigs.push("app.use(cookieParser());");
+  }
+  if (packages.includes("morgan")) {
+    additionalConfigs.push("app.use(morgan('dev'));");
+  }
+  if (packages.includes("cors")) {
+    additionalConfigs.push("app.use(cors());");
+  }
+  if (packages.includes("method-override")) {
+    additionalConfigs.push("app.use(methodOverride('_method'));");
+  }
+
+  const fileContent = `// Your main file content goes here
+${importStatements}
+
+${
+  packages.includes("mongoose")
+    ? "import connectDB from './db/connectDB.js';"
+    : ""
+}
+
+const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+
+${additionalConfigs.join("\n")}
+
+${dotenvConfig}
+\n
+app.get("/", (req, res) => {
+  res.send("App is working");
+});
+\n
+app.listen(PORT, () => {
+    console.log(\`App is listening on \${PORT}\`);
+    ${packages.includes("mongoose") ? "connectDB();" : ""}
+});
+`;
 
   try {
     fs.writeFileSync(mainFilePath, fileContent);
     console.log(`Created file: ${mainFilePath}`);
   } catch (err) {
     console.error("Error creating main file:", err);
-  }
-}
-
-async function createConnectDBFile(backendFolderName) {
-  const targetDir = path.join(process.cwd(), backendFolderName, "db");
-  const connectDBFilePath = path.join(targetDir, "connectDB.js");
-
-  const fileContent = `import mongoose from 'mongoose';
-
-const connectDB = () => {
-    mongoose
-        .connect(process.env.MONGO_URL || "mongodb://127.0.0.1:27017/projectName'")
-        .then(() => {
-            console.log('Connected to the database');
-        })
-        .catch((err) => {
-            console.error('Error connecting to the database:', err.message);
-        });
-};
-
-export default connectDB;
-`;
-
-  try {
-    fs.writeFileSync(connectDBFilePath, fileContent);
-    console.log(`Created file: ${connectDBFilePath}`);
-  } catch (err) {
-    console.error("Error creating connectDB file:", err);
   }
 }
 
