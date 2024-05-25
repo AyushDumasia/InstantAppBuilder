@@ -114,25 +114,35 @@ async function createFrontendStructure(folderName, template) {
   const targetDir = path.join(process.cwd(), folderName);
   try {
     console.log("Creating Vite project...");
-    return new Promise((resolve, reject) => {
-      exec(
-        `npm create vite@latest ${folderName} -- --template ${template}`,
-        { cwd: process.cwd() },
-        (err, stdout, stderr) => {
-          if (err) {
-            console.error(`Error creating Vite project: ${err}`);
-            reject(err);
-            return;
-          }
-          console.log(stdout);
-          console.log("=>Vite project created successfully!");
-          resolve();
-        }
-      );
-    });
+    await execPromise(
+      `npm create vite@latest ${folderName} -- --template ${template}`,
+      process.cwd()
+    );
+    console.log("Vite project created successfully!");
+
+    console.log(`Navigating to ${targetDir} and installing dependencies...`);
+    await execPromise("npm install", targetDir);
+    console.log("Dependencies installed successfully!");
   } catch (err) {
     console.error("Error creating frontend structure:", err);
   }
+}
+
+function execPromise(command, cwd) {
+  return new Promise((resolve, reject) => {
+    exec(command, { cwd }, (err, stdout, stderr) => {
+      if (err) {
+        console.error(`Error executing command: ${err}`);
+        reject(err);
+        return;
+      }
+      console.log(stdout);
+      if (stderr) {
+        console.error(stderr);
+      }
+      resolve();
+    });
+  });
 }
 
 async function promptAndInstallPackages(folderName) {
