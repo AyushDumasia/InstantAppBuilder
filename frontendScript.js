@@ -12,7 +12,7 @@ async function createMainDirectory() {
     folderNames.forEach((folderName) => {
       const destination = path.join(targetDir, folderName);
       fs.mkdirSync(destination);
-      console.log(Created folder: ${destination});
+      console.log(`Created folder: ${destination}`);
     });
 
     console.log("Main directory structure created successfully!");
@@ -39,21 +39,17 @@ async function createFrontendStructure(folderName, template, cssLibrary) {
   try {
     console.log("Creating Vite project...");
     await execPromise(
-      npm create vite@latest ${folderName} -- --template ${template},
+      `npm create vite@latest ${folderName} -- --template ${template}`,
       process.cwd()
     );
     console.log("Vite project created successfully!");
 
-    console.log(Navigating to ${targetDir} and installing dependencies...);
+    console.log(`Navigating to ${targetDir} and installing dependencies...`);
     await execPromise("npm install", targetDir);
     console.log("Dependencies installed successfully!");
 
     if (cssLibrary) {
-<<<<<<< HEAD
       console.log(`Installing ${cssLibrary}...`);
-=======
-      console.log(Installing ${cssLibrary}...);
->>>>>>> 87ba0c613fa6c295805c4e4928fd69a4ebb2c1c6
       if (cssLibrary === "tailwindcss") {
         await execPromise(
           "npm install -D tailwindcss postcss autoprefixer",
@@ -63,13 +59,8 @@ async function createFrontendStructure(folderName, template, cssLibrary) {
         await updateTailwindConfig(targetDir);
         await updateIndexCSS(targetDir);
       }
-<<<<<<< HEAD
       await execPromise(`npm install ${cssLibrary}`, targetDir);
       console.log(`${cssLibrary} installed successfully!`);
-=======
-      await execPromise(npm install ${cssLibrary}, targetDir);
-      console.log(${cssLibrary} installed successfully!);
->>>>>>> 87ba0c613fa6c295805c4e4928fd69a4ebb2c1c6
     }
   } catch (err) {
     console.error("Error creating frontend structure:", err);
@@ -80,7 +71,7 @@ function execPromise(command, cwd) {
   return new Promise((resolve, reject) => {
     exec(command, { cwd }, (err, stdout, stderr) => {
       if (err) {
-        console.error(Error executing command: ${err});
+        console.error(`Error executing command: ${err}`);
         reject(err);
         return;
       }
@@ -99,11 +90,7 @@ async function updateTailwindConfig(targetDir) {
 export default {
   content: [
     "./index.html",
-<<<<<<< HEAD
     "./src/**/*.{js,ts,jsx,tsx}",
-=======
-    "./src//*.{js,ts,jsx,tsx}",
->>>>>>> 87ba0c613fa6c295805c4e4928fd69a4ebb2c1c6
   ],
   theme: {
     extend: {},
@@ -128,7 +115,7 @@ async function promptMainDirectory(prompt, folders) {
   const questions = folders.map((folder) => ({
     type: "input",
     name: folder,
-    message: Enter a name for the ${folder} directory (default: ${folder}),
+    message: `Enter a name for the ${folder} directory (default: ${folder})`,
     default: folder,
   }));
   const answers = await prompt(questions);
@@ -174,8 +161,4 @@ async function promptCSSLibrary(prompt) {
   return answer.library !== "none" ? answer.library : null;
 }
 
-<<<<<<< HEAD
 createMainDirectory();
-=======
-createMainDirectory();
->>>>>>> 87ba0c613fa6c295805c4e4928fd69a4ebb2c1c6
