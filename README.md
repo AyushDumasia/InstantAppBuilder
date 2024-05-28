@@ -1,4 +1,4 @@
-# ez-app-builder
+# instant-app-setup
 
 <div style="text-align:center">
   <img src="https://img.shields.io/npm/v/ez-app-builder.svg?style=flat-square" alt="npm version" height="30">
