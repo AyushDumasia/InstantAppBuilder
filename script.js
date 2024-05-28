@@ -132,6 +132,24 @@ async function createFrontendStructure(folderName, template, cssLibrary) {
 
     if (cssLibrary) {
       console.log(`Installing ${cssLibrary}...`);
+      if (cssLibrary === "emotion") {
+        await execPromise(
+          "npm install @emotion/react @emotion/styled",
+          targetDir
+        );
+      }
+      if (cssLibrary === "chakra-ui") {
+        await execPromise(
+          "npm i @chakra-ui/react @emotion/react @emotion/styled framer-motion",
+          targetDir
+        );
+      }
+      if (cssLibrary === "material-ui") {
+        await execPromise(
+          "npm install @mui/material @emotion/react @emotion/styled",
+          targetDir
+        );
+      }
       if (cssLibrary === "tailwindcss") {
         await execPromise(
           "npm install -D tailwindcss postcss autoprefixer",
@@ -141,7 +159,14 @@ async function createFrontendStructure(folderName, template, cssLibrary) {
         await updateTailwindConfig(targetDir);
         await updateIndexCSS(targetDir);
       }
-      await execPromise(`npm install ${cssLibrary}`, targetDir);
+      if (
+        cssLibrary !== "emotion" &&
+        cssLibrary !== "chakra-ui" &&
+        cssLibrary !== "material-ui" &&
+        cssLibrary !== "tailwindcss"
+      ) {
+        await execPromise(`npm install ${cssLibrary}`, targetDir);
+      }
       console.log(`${cssLibrary} installed successfully!`);
     }
   } catch (err) {
@@ -387,8 +412,8 @@ async function updateTailwindConfig(targetDir) {
   const configContent = `/** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {},

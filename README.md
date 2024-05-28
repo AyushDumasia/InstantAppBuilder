@@ -1,5 +1,3 @@
-# ez-app-builder
-
 <div style="text-align:center">
   <img src="https://img.shields.io/npm/v/ez-app-builder.svg?style=flat-square" alt="npm version" height="30">
   <img src="https://img.shields.io/npm/dm/ez-app-builder.svg?style=flat-square" alt="npm download" height="30">
